@@ -1,12 +1,26 @@
-# MariaDB 10.2 (MySQL 5.7) Docker image on Alpine Linux
+# MariaDB 10.2 (MySQL 5.7) Docker image on Debian
+
+# Specs
+- Compiled MariaDB for armhf
+- Version 10.2.7
 
 ## Docker image usage
 
 ```
-docker run [docker-options] pickapp/mariadb-alpine
+docker run [docker-options] williamdes/mariadb:10.2.7-armhf
+```
+
+Advanced run
+```
+mkdir /mariadb-data
+docker run -d -p 3306:3306 -e TZ=Europe/Paris -v /mariadb-data:/var/lib/mysql williamdes/mariadb:10.2.7-armhf
 ```
 
 Note that MySQL root password will be randomly generated (using pwgen).
+If you need to get the password because you container is in background mode:
+```
+docker logs $(docker ps -qf "ancestor=williamdes/mariadb:10.2.7-armhf") 2>&1 |  grep "MySQL root Password:"
+```
 Root password will be displayed, during first run using output similar to this:
 ```
 [i] MySQL root Password: XXXXXXXXXXXXXXX
@@ -25,7 +39,7 @@ This way you can add any user as well.
 Typical usage:
 
 ```
-docker run -ti -v /host/dir/for/db:/var/lib/mysql -e MYSQL_DATABASE=db -e MYSQL_USER=user -e MYSQL_PASSWORD=blah k0st/alpine-mariadb
+docker run -ti -v /host/dir/for/db:/var/lib/mysql -e MYSQL_DATABASE=db -e MYSQL_USER=user -e MYSQL_PASSWORD=pazzw0rD williamdes/mariadb:10.2.7-armhf
 ```
 
 ## Configuration
@@ -45,5 +59,60 @@ You can create init scripts by mounting a volume into
 ## Notes
 
 - No TokuDB is compiled because it has GLIBC dependencies
-- Partition and blackhole storage engines are loadable dynamic plugins
+- Blackhole is a loadable dynamic plugin
 - It has OQGraph storage engine as well for graph computing
+- Maybe some charsets will not be available see : Dockerfile (-DWITH_EXTRA_CHARSETS=none)
+- UTF-8 is the default charset
+
+## Compile variables
+
+See more in Dockerfile
+
+WITH_JEMALLOC=NO
+WITH_MARIABACKUP=NO
+### Plugins =YES
+PLUGIN_ARCHIVE=YES
+PLUGIN_BLACKHOLE=YES
+PLUGIN_ARIA=YES
+PLUGIN_FEDERATED=YES
+PLUGIN_FEDERATEDX=YES
+PLUGIN_LOCALES=YES
+PLUGIN_METADATA_LOCK_INFO=YES
+PLUGIN_QUERY_RESPONSE_TIME=YES
+PLUGIN_SEMISYNC_MASTER=YES
+PLUGIN_SEMISYNC_SLAVE=YES
+PLUGIN_SQL_ERRLOG=YES
+PLUGIN_WSREP_INFO=YES
+### Plugins =NO
+PLUGIN_AUDIT_NULL=NO
+PLUGIN_CLIENT_ED25519=NO
+PLUGIN_CONNECT=NO
+PLUGIN_DEBUG_KEY_MANAGEMENT=NO
+PLUGIN_EXAMPLE_KEY_MANAGEMENT=NO
+PLUGIN_FEEDBACK=NO
+PLUGIN_FILE_KEY_MANAGEMENT=NO
+PLUGIN_INNOBASE=NO
+PLUGIN_MROONGA=NO
+PLUGIN_PARTITION=NO
+PLUGIN_PERFSCHEMA=NO
+PLUGIN_ROCKSDB=NO
+PLUGIN_SEQUENCE=NO
+PLUGIN_SERVER_AUDIT=NO
+PLUGIN_SPHINX=NO
+PLUGIN_SPIDER=NO
+PLUGIN_OQGRAPH=NO
+### STORAGE ENGINES =ON
+WITH_FEDERATED_STORAGE_ENGINE=ON
+WITH_EXAMPLE_STORAGE_ENGINE=ON
+WITH_PBXT_STORAGE_ENGINE=ON
+WITH_TOKUDB_STORAGE_ENGINE=ON
+WITH_SPHINX_STORAGE_ENGINE=ON
+### STORAGE ENGINES =OFF
+WITH_EMBEDDED_SERVER=OFF
+WITH_PARTITION_STORAGE_ENGINE=OFF
+WITH_PERFSCHEMA_STORAGE_ENGINE=OFF
+WITH_ROCKSDB_STORAGE_ENGINE=OFF
+### Others
+WITH_UNIT_TESTS=OFF
+ENABLED_PROFILING=OFF
+ENABLE_DEBUG_SYNC=OFF

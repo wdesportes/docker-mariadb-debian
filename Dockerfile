@@ -1,49 +1,30 @@
-FROM alpine:3.4
-MAINTAINER Adam Wallner <wallner@bitbaro.hu>
+FROM armhf/debian:latest
+MAINTAINER William Desportes <williamdes@wdes.fr>
 
-# The version numbers to download and build
-ENV MARIADB_VER 10.2.5
-ENV JUDY_VER 1.0.5
-
+# The version numbers to download and build and the cpu core count
+ENV MARIADB_VER 10.2.7
+ENV CPU_NBR 3
 ADD start.sh /opt/mariadb/start.sh
-
-RUN \
-    export CPU=`cat /proc/cpuinfo | grep -c processor` \
-    # Add testing repo
-    && echo http://nl.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories \
+RUN mkdir -p /opt/src \
+    && mkdir -p /etc/mysql \
     # Install packages
-    && apk add --no-cache \
-        # Install utils
+    && apt-get update \
+    && apt-get install -y \
         pwgen openssl ca-certificates \
         # Installing needed libs
-        libstdc++ libaio gnutls ncurses-libs libcurl libxml2 boost proj4 geos \
-        # Install MariaDB build deps
-        alpine-sdk cmake ncurses-dev gnutls-dev curl-dev libxml2-dev libaio-dev linux-headers bison boost-dev \
-    # Update CA certs
+        libstdc++6 libaio-dev libgnutls28-dev libncurses-dev libcurl4-openssl-dev libxml2 \
+        cmake ncurses-dev gnutls-dev libxml2-dev libaio-dev bison libboost-dev curl wget \
+    build-essential liblz4-1 liblz4-dev lzma liblzma-dev openssl libssl-dev \
     && update-ca-certificates \
-    # Add group and user for mysql
-    && addgroup -S -g 500 mysql \
-    && adduser -S -D -H -u 500 -G mysql -g "MySQL" mysql \
+    && apt-get clean \
     # Download and unpack mariadb
-    && mkdir -p /opt/src \
-    && mkdir -p /etc/mysql \
     && wget -O /opt/src/mdb.tar.gz https://downloads.mariadb.org/interstitial/mariadb-${MARIADB_VER}/source/mariadb-${MARIADB_VER}.tar.gz \
     && cd /opt/src && tar -xf mdb.tar.gz && rm mdb.tar.gz \
-    # Download and unpack Judy (needed for OQGraph)
-    && wget -O /opt/src/judy.tar.gz http://downloads.sourceforge.net/project/judy/judy/Judy-${JUDY_VER}/Judy-${JUDY_VER}.tar.gz \
-    && cd /opt/src && tar -xf judy.tar.gz && rm judy.tar.gz \
-    # Build Judy
-    && cd /opt/src/judy-${JUDY_VER} \
-    && CFLAGS="-O2 -s" CXXFLAGS="-O2 -s" ./configure \
-    && make \
-    && make install \
     # Build maridb
     && mkdir -p /tmp/_ \
     && cd /opt/src/mariadb-${MARIADB_VER} \
     && cmake . \
-        -DCMAKE_BUILD_TYPE=MinSizeRel \
-        -DCOMMON_C_FLAGS="-O3 -s -fno-omit-frame-pointer -pipe" \
-        -DCOMMON_CXX_FLAGS="-O3 -s -fno-omit-frame-pointer -pipe" \
+        -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/usr \
         -DSYSCONFDIR=/etc/mysql \
         -DMYSQL_DATADIR=/var/lib/mysql \
@@ -65,38 +46,56 @@ RUN \
         -DWITH_ZLIB=system \
         -DWITH_SSL=system \
         -DWITH_LIBWRAP=OFF \
-        -DWITH_JEMALLOC=no \
-        -DWITH_EXTRA_CHARSETS=complex \
-        -DPLUGIN_ARCHIVE=STATIC \
-        -DPLUGIN_BLACKHOLE=DYNAMIC \
-        -DPLUGIN_INNOBASE=STATIC \
-        -DPLUGIN_PARTITION=AUTO \
+        -DWITH_JEMALLOC=NO \
+        -DWITH_MARIABACKUP=NO \
+        -DWITH_EXTRA_CHARSETS=none \
+        -DPLUGIN_ARCHIVE=YES \
+        -DPLUGIN_ARIA=YES \
+        -DPLUGIN_AUDIT_NULL=NO \
+        -DPLUGIN_BLACKHOLE=YES \
+        -DPLUGIN_CLIENT_ED25519=NO \
         -DPLUGIN_CONNECT=NO \
-        -DPLUGIN_TOKUDB=NO \
+        -DPLUGIN_DEBUG_KEY_MANAGEMENT=NO \
+        -DPLUGIN_EXAMPLE_KEY_MANAGEMENT=NO \
+        -DPLUGIN_FEDERATED=YES \
+        -DPLUGIN_FEDERATEDX=YES \
         -DPLUGIN_FEEDBACK=NO \
-        -DPLUGIN_OQGRAPH=YES \
-        -DPLUGIN_FEDERATED=NO \
-        -DPLUGIN_FEDERATEDX=NO \
-        -DWITHOUT_FEDERATED_STORAGE_ENGINE=1 \
-        -DWITHOUT_EXAMPLE_STORAGE_ENGINE=1 \
-        -DWITHOUT_PBXT_STORAGE_ENGINE=1 \
-        -DWITHOUT_ROCKSDB_STORAGE_ENGINE=1 \
+        -DPLUGIN_FILE_KEY_MANAGEMENT=NO \
+        -DPLUGIN_INNOBASE=NO \
+        -DPLUGIN_LOCALES=YES \
+        -DPLUGIN_METADATA_LOCK_INFO=YES \
+        -DPLUGIN_MROONGA=NO \
+        -DPLUGIN_PARTITION=NO \
+        -DPLUGIN_PERFSCHEMA=NO \
+        -DPLUGIN_QUERY_RESPONSE_TIME=YES \
+        -DPLUGIN_ROCKSDB=NO \
+        -DPLUGIN_SEMISYNC_MASTER=YES \
+        -DPLUGIN_SEMISYNC_SLAVE=YES \
+        -DPLUGIN_SEQUENCE=NO \
+        -DPLUGIN_SERVER_AUDIT=NO \
+        -DPLUGIN_SPHINX=NO \
+        -DPLUGIN_SPIDER=NO \
+        -DPLUGIN_SQL_ERRLOG=YES \
+        -DPLUGIN_WSREP_INFO=YES \
+                -DPLUGIN_OQGRAPH=NO \
+        -DWITH_FEDERATED_STORAGE_ENGINE=ON \
+        -DWITH_EXAMPLE_STORAGE_ENGINE=ON \
+        -DWITH_PBXT_STORAGE_ENGINE=ON \
+        -DWITH_ROCKSDB_STORAGE_ENGINE=OFF \
+        -DWITH_TOKUDB_STORAGE_ENGINE=ON \
         -DWITH_EMBEDDED_SERVER=OFF \
+        -DWITH_PARTITION_STORAGE_ENGINE=OFF \
+        -DWITH_PERFSCHEMA_STORAGE_ENGINE=OFF \
+        -DWITH_SPHINX_STORAGE_ENGINE=ON \
         -DWITH_UNIT_TESTS=OFF \
         -DENABLED_PROFILING=OFF \
         -DENABLE_DEBUG_SYNC=OFF \
-    && make -j${CPU} \
-    # Install
-    && make -j${CPU} install \
-    # Copy default config, and remove deprecates and not working things
+    && make -j${CPU_NBR} \
+        # Install
+    && make -j${CPU_NBR} install \
+    # Copy default config
     && cp /usr/share/mysql/my-large.cnf /etc/mysql/my.cnf \
     && echo "!includedir /etc/mysql/conf.d/" >>/etc/mysql/my.cnf \
-    && sed -i '/# Try number of CPU/d' /etc/mysql/my.cnf \
-    && sed -i '/thread_concurrency = 8/d' /etc/mysql/my.cnf \
-    && sed -i '/innodb_additional_mem_pool_size/d' /etc/mysql/my.cnf \
-    && sed -i 's/log-bin=/#log-bin=/' /etc/mysql/my.cnf \
-    && sed -i 's/binlog_format=/#binlog_format=/' /etc/mysql/my.cnf \
-    && sed -i 's/#innodb_/innodb_/' /etc/mysql/my.cnf \
     # Clean everything
     && rm -rf /opt/src \
     && rm -rf /tmp/_ \
@@ -106,11 +105,7 @@ RUN \
     && rm -rf /usr/lib/python2.7 \
     && rm -rf /usr/bin/mysql_client_test \
     && rm -rf /usr/bin/mysqltest \
-    # Remove packages
-    && apk del \
-        ca-certificates \
-        # Remove no more necessary build dependencies
-        alpine-sdk cmake ncurses-dev gnutls-dev curl-dev libxml2-dev libaio-dev linux-headers bison boost-dev \
+    && apt-get autoremove -y --force-yes \
     # Create needed directories
     && mkdir -p /var/lib/mysql \
     && mkdir -p /run/mysqld \
@@ -119,10 +114,12 @@ RUN \
     && mkdir -p /opt/mariadb/post-init.d \
     && mkdir -p /opt/mariadb/pre-exec.d \
     # Set permissions
+    && chmod -R 755 /opt/mariadb \
+    && addgroup --system -gid 500 mysql \
+    && adduser --system --no-create-home --uid 500 --gid 500 mysql \
     && chown -R mysql:mysql /var/lib/mysql \
-    && chown -R mysql:mysql /run/mysqld\
-    && chmod -R 755 /opt/mariadb
-
+    && chown -R mysql:mysql /run/mysqld
+ADD my.cnf /etc/mysql/my.cnf
 EXPOSE 3306
 
 VOLUME ["/var/lib/mysql"]
