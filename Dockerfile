@@ -2,7 +2,7 @@ FROM armhf/debian:latest
 MAINTAINER William Desportes <williamdes@wdes.fr>
 
 # The version numbers to download and build and the cpu core count
-ENV MARIADB_VER 10.2.7
+ENV MARIADB_VER 10.2.9
 ENV CPU_NBR 3
 ADD start.sh /opt/mariadb/start.sh
 RUN mkdir -p /opt/src \
@@ -48,7 +48,7 @@ RUN mkdir -p /opt/src \
         -DWITH_LIBWRAP=OFF \
         -DWITH_JEMALLOC=NO \
         -DWITH_MARIABACKUP=NO \
-        -DWITH_EXTRA_CHARSETS=none \
+        -DWITH_EXTRA_CHARSETS=complex \
         -DPLUGIN_ARCHIVE=YES \
         -DPLUGIN_ARIA=YES \
         -DPLUGIN_AUDIT_NULL=NO \
@@ -61,7 +61,7 @@ RUN mkdir -p /opt/src \
         -DPLUGIN_FEDERATEDX=YES \
         -DPLUGIN_FEEDBACK=NO \
         -DPLUGIN_FILE_KEY_MANAGEMENT=NO \
-        -DPLUGIN_INNOBASE=NO \
+        -DPLUGIN_INNOBASE=YES \
         -DPLUGIN_LOCALES=YES \
         -DPLUGIN_METADATA_LOCK_INFO=YES \
         -DPLUGIN_MROONGA=NO \
@@ -77,7 +77,7 @@ RUN mkdir -p /opt/src \
         -DPLUGIN_SPIDER=NO \
         -DPLUGIN_SQL_ERRLOG=YES \
         -DPLUGIN_WSREP_INFO=YES \
-                -DPLUGIN_OQGRAPH=NO \
+        -DPLUGIN_OQGRAPH=NO \
         -DWITH_FEDERATED_STORAGE_ENGINE=ON \
         -DWITH_EXAMPLE_STORAGE_ENGINE=ON \
         -DWITH_PBXT_STORAGE_ENGINE=ON \

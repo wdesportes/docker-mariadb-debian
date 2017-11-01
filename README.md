@@ -2,24 +2,24 @@
 
 # Specs
 - Compiled MariaDB for armhf
-- Version 10.2.7
+- Version 10.2.9
 
 ## Docker image usage
 
 ```
-docker run [docker-options] williamdes/mariadb:10.2.7-armhf
+docker run [docker-options] williamdes/docker-mariadb-debian:10.2.9-armhf
 ```
 
 Advanced run
 ```
 mkdir /mariadb-data
-docker run -d -p 3306:3306 -e TZ=Europe/Paris -v /mariadb-data:/var/lib/mysql williamdes/mariadb:10.2.7-armhf
+docker run -d -p 3306:3306 -e TZ=Europe/Paris -v /mariadb-data:/var/lib/mysql williamdes/docker-mariadb-debian:10.2.9-armhf
 ```
 
 Note that MySQL root password will be randomly generated (using pwgen).
 If you need to get the password because you container is in background mode:
 ```
-docker logs $(docker ps -qf "ancestor=williamdes/mariadb:10.2.7-armhf") 2>&1 |  grep "MySQL root Password:"
+docker logs $(docker ps -qf "ancestor=williamdes/docker-mariadb-debian:10.2.9-armhf") 2>&1 |  grep "MySQL root Password:"
 ```
 Root password will be displayed, during first run using output similar to this:
 ```
@@ -39,7 +39,7 @@ This way you can add any user as well.
 Typical usage:
 
 ```
-docker run -ti -v /host/dir/for/db:/var/lib/mysql -e MYSQL_DATABASE=db -e MYSQL_USER=user -e MYSQL_PASSWORD=pazzw0rD williamdes/mariadb:10.2.7-armhf
+docker run -ti -v /host/dir/for/db:/var/lib/mysql -e MYSQL_DATABASE=db -e MYSQL_USER=user -e MYSQL_PASSWORD=pazzw0rD williamdes/docker-mariadb-debian:10.2.9-armhf
 ```
 
 ## Configuration
@@ -58,10 +58,6 @@ You can create init scripts by mounting a volume into
 
 ## Notes
 
-- No TokuDB is compiled because it has GLIBC dependencies
-- Blackhole is a loadable dynamic plugin
-- It has OQGraph storage engine as well for graph computing
-- Maybe some charsets will not be available see : Dockerfile (-DWITH_EXTRA_CHARSETS=none)
 - UTF-8 is the default charset
 
 ## Compile variables
@@ -91,7 +87,7 @@ See more in Dockerfile
   PLUGIN_EXAMPLE_KEY_MANAGEMENT=NO  
   PLUGIN_FEEDBACK=NO  
   PLUGIN_FILE_KEY_MANAGEMENT=NO  
-  PLUGIN_INNOBASE=NO  
+  PLUGIN_INNOBASE=YES  
   PLUGIN_MROONGA=NO  
   PLUGIN_PARTITION=NO  
   PLUGIN_PERFSCHEMA=NO  
