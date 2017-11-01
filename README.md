@@ -64,8 +64,6 @@ You can create init scripts by mounting a volume into
 
 See more in Dockerfile
 
-  WITH_JEMALLOC=NO  
-  WITH_MARIABACKUP=NO  
 ### Plugins = YES
   PLUGIN_ARCHIVE=YES  
   PLUGIN_BLACKHOLE=YES  
@@ -109,6 +107,8 @@ See more in Dockerfile
   WITH_PERFSCHEMA_STORAGE_ENGINE=OFF  
   WITH_ROCKSDB_STORAGE_ENGINE=OFF  
 ### Others
-  WITH_UNIT_TESTS=OFF  
+  WITH_JEMALLOC=NO    
+  WITH_MARIABACKUP=NO   
+  WITH_UNIT_TESTS=OFF    
   ENABLED_PROFILING=OFF  
   ENABLE_DEBUG_SYNC=OFF  
