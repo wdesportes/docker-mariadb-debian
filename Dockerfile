@@ -2,7 +2,7 @@ FROM armhf/debian:latest
 MAINTAINER William Desportes <williamdes@wdes.fr>
 
 # The version numbers to download and build and the cpu core count
-ENV MARIADB_VER 10.2.9
+ENV MARIADB_VER 10.2.10
 ENV CPU_NBR 3
 ADD start.sh /opt/mariadb/start.sh
 RUN mkdir -p /opt/src \

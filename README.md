@@ -5,23 +5,24 @@
 # Specs
 - Compiled from source, [MariaDB](https://mariadb.com/products/technology/server) for armhf
 - Version [10.2.9](https://mariadb.com/kb/en/library/mariadb-1029-release-notes/)
+- Version [10.2.10](https://mariadb.com/kb/en/library/mariadb-10210-release-notes/)
 
 ## Docker image usage
 
 ```
-docker run [docker-options] williamdes/docker-mariadb-debian:10.2.9-armhf
+docker run [docker-options] williamdes/docker-mariadb-debian:10.2.10-armhf
 ```
 
 Advanced run
 ```
 mkdir /mariadb-data
-docker run -d -p 3306:3306 -e TZ=Europe/Paris -v /mariadb-data:/var/lib/mysql williamdes/docker-mariadb-debian:10.2.9-armhf
+docker run -d -p 3306:3306 -e TZ=Europe/Paris -v /mariadb-data:/var/lib/mysql williamdes/docker-mariadb-debian:10.2.10-armhf
 ```
 
 Note that MySQL root password will be randomly generated (using pwgen).
 If you need to get the password because you container is in background mode:
 ```
-docker logs $(docker ps -qf "ancestor=williamdes/docker-mariadb-debian:10.2.9-armhf") 2>&1 |  grep "MySQL root Password:"
+docker logs $(docker ps -qf "ancestor=williamdes/docker-mariadb-debian:10.2.10-armhf") 2>&1 |  grep "MySQL root Password:"
 ```
 Root password will be displayed, during first run using output similar to this:
 ```
@@ -41,7 +42,7 @@ This way you can add any user as well.
 Typical usage:
 
 ```
-docker run -ti -v /host/dir/for/db:/var/lib/mysql -e MYSQL_DATABASE=db -e MYSQL_USER=user -e MYSQL_PASSWORD=pazzw0rD williamdes/docker-mariadb-debian:10.2.9-armhf
+docker run -ti -v /host/dir/for/db:/var/lib/mysql -e MYSQL_DATABASE=db -e MYSQL_USER=user -e MYSQL_PASSWORD=pazzw0rD williamdes/docker-mariadb-debian:10.2.10-armhf
 ```
 
 ## Configuration
