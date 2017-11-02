@@ -1,8 +1,10 @@
 # MariaDB 10.2 (MySQL 5.7) Docker image on Debian
 
+[Docker Hub](https://hub.docker.com/r/williamdes/docker-mariadb-debian/)
+
 # Specs
-- Compiled MariaDB for armhf
-- Version 10.2.9
+- Compiled from source, [MariaDB](https://mariadb.com/products/technology/server) for armhf
+- Version [10.2.9](https://mariadb.com/kb/en/library/mariadb-1029-release-notes/)
 
 ## Docker image usage
 
